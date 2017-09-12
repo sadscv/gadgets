@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 17-7-28 下午9:34
-# @Author  : sadscv
+# @Author  : chen
 # @File    : autoLogin.py
 
 import requests
@@ -16,8 +16,8 @@ headers = {
 
 logindata = {
     'action': 'login',
-    'username': '416116115079',
-    'password': '{B}Mjg2MTE1',
+    'username': '416114516079',
+    'password': '{B}MTUwMzEx',
     'ac_id' : 1,
     'save_me' : 1,
     'ajax' : 1
