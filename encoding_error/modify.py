@@ -1,7 +1,7 @@
-# -*- coding: cp936 -*-
+# -*- coding: utf8 -*-
 
-temp = '### FileOperationÀà£º°üº¬¶ÔÎÄ¼þµÄ²Ù×÷£¨ÎªÁË±ãÓÚµ÷ÊÔºÍ¹Û²ì£¬ÎÒ°ÑÍøÒ³ÐÅÏ¢Ð´ÈëÁËÎÄ¼þÖÐ£¬ËùÒÔÓÐÁËÕâ¸öÎÄ¼þ²Ù×÷Àà£©####'
-# temp = '±±¾©'
+temp = '脌脿拢潞掳眉潞卢露脭脦脛录镁碌脛虏脵脳梅拢篓脦陋脕脣卤茫脫脷碌梅脢脭潞脥鹿脹虏矛拢卢脦脪掳脩脥酶脪鲁脨脜脧垄脨麓脠毛脕脣脦脛录镁脰脨拢卢脣霉脪脭脫脨脕脣脮芒赂枚脦脛录镁虏脵脳梅脌脿拢漏####'
+# temp = '卤卤戮漏'
 # file = temp.encode('utf8')
 import chardet
 # out = chardet.detect(file)
@@ -11,10 +11,13 @@ import chardet
 # f.write('t1')
 # f.close()
 # f1 = open('tmp.txt', )
-origin = open('./data.py', 'rb')
+with open('./data.py', 'r') as f, open('./data_decode.py', 'w+') as fo:
+    t1 = f.read().encode('gbk').decode('utf8').encode('latin-1').decode('gbk')
+    fo.write(t1)
+    print(t1)
 
-t2 = origin.read().decode('utf-8').encode('ISO-8859-1').decode('utf-8')
-# print(temp.encode('utf8').decode('ISO-8859-1'))
+
+# print(temp.encode('gbk').decode('utf8').encode('latin-1').decode('gbk'))
 # for t in temp:
 #     print(t.encode('utf8'))
 
