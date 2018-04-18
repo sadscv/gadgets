@@ -1,0 +1,9 @@
+21:54:01,930 __main__ INFO     loading file
+21:54:01,930 __main__ INFO     validating:plane1 1 1 1,result:True<==== line:0
+21:54:01,930 __main__ INFO     validating:plane1 1 1 1 1 2 3,result:True<==== line:1
+21:54:01,930 __main__ INFO     validating:plane1 2 3 4 1 1 1,result:True<==== line:2
+21:54:01,930 __main__ ERROR    length is 4 but not first appear in area <==== line:3
+21:54:01,930 __main__ INFO     validating:plane1 3 4 5,result:False<==== line:3
+21:54:01,930 __main__ INFO     validating:plane1 1 1 1 1 2 3,result:False<==== line:4
+21:54:03,118 __main__ INFO     Check line: result:['plane1', 1, 2, 3, 4] <==== line:1
+21:54:03,703 __main__ INFO     Check line: result:['plane1', 2, 3, 4, 5] <==== line:2

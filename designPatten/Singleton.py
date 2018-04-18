@@ -4,8 +4,7 @@ import time
 class Singleton(object):#抽象单例
     def __new__(cls, *args, **kw):
         if not hasattr(cls, '_instance'):
-            orig = super(Singleton, cls)
-            cls._instance = orig.__new__(cls, *args, **kw)
+            cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)
         return cls._instance
 #总线
 class Bus(Singleton):
