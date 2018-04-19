@@ -1,6 +1,6 @@
 # 使用
 
-* 将data文件放入data文件夹，并更名为 trainSessionDeepMedic.txt
+* 在根目录创建data将data文件放入data文件夹，并更名为 trainSessionDeepMedic.txt
 
 * `python3 text_extract.py` 
 
