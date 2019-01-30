@@ -170,3 +170,10 @@ ENV/
 /ZJ_text_extract/data/Epoch_1.json
 /ZJ_text_extract/data/Epoch_13.json
 /ZJ_text_extract/data/Epoch_21.json
+/AutoExam/data/source/
+AutoExam/data/
+/AutoExam/data/source/最后.vb
+/AutoExam/data/source/排补考.vb
+/AutoExam/data/source/非学分制排考.vb
+/AutoExam/data/source/排教室.vb
+/AutoExam/data/source/进入.vb
