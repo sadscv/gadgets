@@ -1,7 +1,7 @@
 import os
-from pprint import pprint
 
 from docx import Document
+
 
 def convert2list(table, name):
     table_temp = {}
@@ -64,10 +64,13 @@ def write_xls(files):
                     print(k,v)
         tmp_dicts.append(tmp_dict)
 
+    # 创建一个Workbook对象，这就相当于创建了一个Excel文件
     book = xlwt.Workbook(encoding='utf-8',
-                         style_compression=0)  # 创建一个Workbook对象，这就相当于创建了一个Excel文件
+                         style_compression=0)
+    # 其中的test是这张表的名字,cell_overwrite_ok，表示是否可以覆盖单元格，
+    # 其实是Worksheet实例化的一个参数，默认值是False
     sheet = book.add_sheet('test',
-                           cell_overwrite_ok=True)  # # 其中的test是这张表的名字,cell_overwrite_ok，表示是否可以覆盖单元格，其实是Worksheet实例化的一个参数，默认值是False
+                           cell_overwrite_ok=True)
 
     # 设置表头
     i = 0
