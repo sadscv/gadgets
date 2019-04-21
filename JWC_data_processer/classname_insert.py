@@ -121,7 +121,7 @@ class class_insertor(object):
 
     def get_teacher_lists(self):
         conn_local, cursor_local = self.db_init_local()
-        sql = "select distinct 教号 from 音乐学院小课数据;"
+        sql = "select 教号, COUNT(教号) as 次数 from 音乐学院小课数据 group by 教号;"
         result = cursor_local.execute(sql).fetchall()
         return result
 
@@ -132,5 +132,6 @@ if __name__ == '__main__':
     teacher_list = ['jwc046']
     insertor = class_insertor()
     teacher_list = insertor.get_teacher_lists()
-    teacher_list = [t[0].strip() for t in teacher_list]
+    print(teacher_list)
+    # teacher_list = [t[0].strip() for t in teacher_list]
     insertor.insert_course_name(teacher_list)
