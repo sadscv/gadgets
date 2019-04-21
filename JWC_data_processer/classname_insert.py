@@ -1,13 +1,15 @@
 
 import platform
+import pyodbc
 import sqlite3
 
 
 class class_insertor(object):
-    def __init__(self):
-        pass
 
-    def db_init(db_path=None):
+    def __init__(self):
+        self.conn, self.cursor = self.db_init()
+
+    def db_init(self, db_path=None):
         """
         init db connection, Win&&Linux supported
         :return: conn
@@ -27,15 +29,9 @@ class class_insertor(object):
             dsn = 'web'
             user = '090134'
             password = 'sadsad'
-            # charset = 'GBK'
-            # odbc_conn_str = "DRIVER={{SQL Server Native Client 11.0}};" \
-            #                 "SERVER={};" \
-            #                 "DATABASE={};" \
-            #                 "UID={};" \
-            #                 "PWD={};".format(db_path, database, user, password)
             odbc_conn_str = "DSN={};UID={};PWD={}".format(dsn, user, password)
+
             import pyodbc
-            odbc_conn_str = odbc_conn_str
             print(odbc_conn_str)
             conn = pyodbc.connect(odbc_conn_str)
             return conn, conn.cursor()
@@ -44,25 +40,37 @@ class class_insertor(object):
 
     def get_course_info_by_t_id(self, cursor, t_id, split_class=True,
                                 score_status=True):
+        """
+        assign 5 class name to each teacher `t_id` at most. before we insert data
+        we should test if the class_id and class_name have already existed in db.
+
+        :param cursor:
+        :param t_id:
+        :param split_class:
+        :param score_status:
+        :return:
+        """
         class_infos = []
+        sql_tea = "select 姓名 from 教工 where 教号='{}';".format(t_id)
+        teacher_name = cursor.execute(sql_tea).fetchone()[0]
+        if not teacher_name:
+            assert ValueError('no teacher_id existed on db'.format(t_id))
         for i in range(1, 6):
             class_info = {}
             tmp_class_id = t_id + '#' + str(i)
             sql = "select * from dbo.班级 where 班级号='{}';".format(
                 str(tmp_class_id))
             # Todo: test if execute result is null
-            class_name = cursor.execute(sql).fetchone()
+            class_id = cursor.execute(sql).fetchone()
             # Todo: test if course_name already existed.
-            if class_name:
-                print('course_id already existed :{}'.format(class_name))
+            if class_id:
+                print('course_id already existed :{}'.format(class_id))
                 continue
             else:
-                sql_tea = "select 姓名 from 教工 where 教号={}".format(t_id)
-                teacher_name = cursor.execute(sql_tea).fetchall()
-                # class_name = "拆班教工" + teacher_name + "#" + i + "班"
-                # sql = "select * from 班级 where 班级名称={}".format(class_name)
+                class_name = "拆班教工" + teacher_name + "#" + str(i) + "班"
+                sql = "select * from 班级 where 班级名称='{}';".format(class_name)
+                print(sql)
                 if cursor.execute(sql).fetchone():
-                    print(sql)
                     continue
                 else:
                     class_info['class_id'] = tmp_class_id
@@ -74,18 +82,55 @@ class class_insertor(object):
             class_infos.append(class_info)
         return class_infos
 
-    def insert_course_name(teacher_list):
-        conn, cursor = class_insertor.db_init()
+    def insert_course_name(self, teacher_list):
+        """
+
+        :param teacher_list:
+        :return:
+        """
+        self.conn_local, self.cursor_local = self.db_init_local()
         for t_id in teacher_list:
-            class_infos = class_insertor.get_course_info_by_t_id(cursor, t_id)
+            class_infos = self.get_course_info_by_t_id(self.cursor, t_id)
             for info in class_infos:
-                sql = "insert into 班级 values ('{}','{}','{}',,,'{}',,,,,);".format(
-                    info['class_id'], info['class_name'], info['class_prop'],
-                    info['score_status'])
-                print(sql)
+                sql = "INSERT into tmp_class " \
+                      "VALUES ('{}','{}','{}',NULL,NULL,'{}',NULL,NULL,NULL,NULL,NULL);" \
+                    .format(info['class_id'],
+                            info['class_name'],
+                            info['class_prop'],
+                            info['score_status'])
+                print('$', sql)
+                # sql = "select * from tmp_tea_id"
+                # while self.cursor_local.execute(sql).fetchall():
+                #     try:
+                #         result = self.cursor_local.fetchall()
+                #         break
+                #     except pyodbc.ProgrammingError:
+                #         continue
+                self.cursor_local.execute(sql).commit()
                 # Todo: cursor.execute(sql)
+
+    def db_init_local(self):
+        db_path = "C:\\Users\sadscv\Desktop\外网.accdb"
+        user = ''
+        password = ''
+        odbc_conn_str = "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};" \
+                        "DBQ=%s;" % (db_path)
+
+        conn = pyodbc.connect(odbc_conn_str)
+        return conn, conn.cursor()
+
+    def get_teacher_lists(self):
+        conn_local, cursor_local = self.db_init_local()
+        sql = "select distinct 教号 from 音乐学院小课数据;"
+        result = cursor_local.execute(sql).fetchall()
+        return result
+
+
 
 
 if __name__ == '__main__':
-    teacher_list = ['090134']
-    class_insertor.insert_course_name(teacher_list)
+    teacher_list = ['jwc046']
+    insertor = class_insertor()
+    teacher_list = insertor.get_teacher_lists()
+    teacher_list = [t[0].strip() for t in teacher_list]
+    insertor.insert_course_name(teacher_list)
