@@ -3,6 +3,8 @@ import platform
 import pyodbc
 import sqlite3
 
+from JWC_data_processer import config
+
 
 class class_insertor(object):
 
@@ -15,6 +17,7 @@ class class_insertor(object):
         :return: conn
         """
         db_path = '219.229.250.19:1433'
+        db_path = config.dbpath
         my_platform = platform.system()
         if my_platform == 'Linux':
             conn = sqlite3.connect(db_path)
@@ -38,7 +41,7 @@ class class_insertor(object):
         else:
             raise OSError('Unsupported OS')
 
-    def get_course_info_by_t_id(self, cursor, t_id, split_class=True,
+    def get_course_info_by_t_id(self, cursor, t_id, t_count, split_class=True,
                                 score_status=True):
         """
         assign 5 class name to each teacher `t_id` at most. before we insert data
@@ -55,7 +58,8 @@ class class_insertor(object):
         teacher_name = cursor.execute(sql_tea).fetchone()[0]
         if not teacher_name:
             assert ValueError('no teacher_id existed on db'.format(t_id))
-        for i in range(1, 6):
+        # for i in range(1, 6):
+        for i in range(1, t_count + 1):
             class_info = {}
             tmp_class_id = t_id + '#' + str(i)
             sql = "select * from dbo.班级 where 班级号='{}';".format(
@@ -89,8 +93,9 @@ class class_insertor(object):
         :return:
         """
         self.conn_local, self.cursor_local = self.db_init_local()
-        for t_id in teacher_list:
-            class_infos = self.get_course_info_by_t_id(self.cursor, t_id)
+        for t_id, t_count in teacher_list:
+            class_infos = self.get_course_info_by_t_id(self.cursor, t_id,
+                                                       t_count)
             for info in class_infos:
                 sql = "INSERT into tmp_class " \
                       "VALUES ('{}','{}','{}',NULL,NULL,'{}',NULL,NULL,NULL,NULL,NULL);" \
@@ -125,6 +130,28 @@ class class_insertor(object):
         result = cursor_local.execute(sql).fetchall()
         return result
 
+    def insert_split_data(self, teacher_list):
+        """
+
+        :param teacher_list: [(t_id, num),()]
+        :return:
+        """
+
+        conn_local, cursor_local = self.db_init_local()
+        print(teacher_list)
+        for t in teacher_list:
+            sql = "select * from 音乐学院小课数据 where 教号='{}';".format(t[0])
+            result = cursor_local.execute(sql).fetchall()
+            tmp_tea_id = t[0]
+            for i in range(t[1]):
+                class_id = tmp_tea_id + '#' + str(i + 1)
+                tmp = result[i][-1:][0]
+                sql = "update 音乐学院小课数据 set 1='{}' where id={};".format(class_id,
+                                                                       tmp)
+                cursor_local.execute(sql)
+                print(sql)
+                cursor_local.commit()
+
 
 
 
@@ -132,6 +159,6 @@ if __name__ == '__main__':
     teacher_list = ['jwc046']
     insertor = class_insertor()
     teacher_list = insertor.get_teacher_lists()
-    print(teacher_list)
-    # teacher_list = [t[0].strip() for t in teacher_list]
+    teacher_list = [(t[0].strip(), t[1]) for t in teacher_list]
     insertor.insert_course_name(teacher_list)
+    # insertor.insert_split_data(teacher_list)
