@@ -6,17 +6,15 @@
 @file: class_generator.py
 @desc:
 """
-import pyodbc
 import re
 
 import openpyxl as openpyxl
-from openpyxl import Workbook
 
 
 class CONFIG:
     input_path = "docs/江西师范大学2019年本科招生计划一览表（530定）.xlsx"
-    output_path = "docs/output.xlsx"
-    old_campus_list = ['音乐学', '音乐表演', '舞蹈学', '表演(健美操方向）',
+    output_path = "docs/class_table.xlsx"
+    major_list_old_campus = ['音乐学', '音乐表演', '舞蹈学', '表演(健美操方向）',
                        '表演（体育舞蹈方向）', '武术与民族传统体育']
 
 
@@ -40,8 +38,8 @@ class ClassGenerator:
 
     def read_line(self, row, major_name):
         major_population = int(row[13].value)
-        processed_line = {}
         for i in range(int(row[16].value)):
+            processed_line = {}
             class_population = major_population // (int(row[16].value) - i)
             major_population -= class_population
             tmp = re.match('[\u4e00-\u9fa5]', major_name)
@@ -62,25 +60,39 @@ class ClassGenerator:
             else:
                 self.count += 1
                 class_name = "19级{}{}班".format(major_name, i + 1)
-            processed_line['班级号'] = self.count
+            processed_line['班级号'] = self.count + 20190000
             processed_line['班级名称'] = class_name
             processed_line['班级性质号'] = '01'
             processed_line['年级号'] = '2019/9/1'
             processed_line['班级人数'] = class_population
             processed_line['学分制状态'] = '1'
-            if major_name in self.config.old_campus_list:
+            processed_line['专业名称'] = major_name
+            if major_name in self.config.major_list_old_campus:
                 processed_line['教学区号'] = '01'
             else:
                 processed_line['教学区号'] = '02'
             self.processed_lines.append(processed_line)
-        print('1')
 
     def write2xls(self):
-        wb = Workbook()
+        wb = openpyxl.load_workbook(self.config.output_path)
         ws = wb.active
-        ws['A1'] = '班级号'
-        for item in range(len(self.processed_lines)):
-            print(item)
+        # for item in range(len(self.processed_lines)):
+        #     print(item)
+        index = 0
+        for line in self.processed_lines:
+            index += 1
+            for item in line:
+                print(line['班级名称'])
+                ws['A' + str(index + 1)] = line['班级号']
+                ws['B' + str(index + 1)] = line['班级名称']
+                ws['C' + str(index + 1)] = line['班级性质号']
+                ws['D' + str(index + 1)] = line['年级号']
+                ws['E' + str(index + 1)] = line['班级人数']
+                ws['F' + str(index + 1)] = line['学分制状态']
+                # ws['I'+str(index+1)] = line['专业名称']
+                ws['J' + str(index + 1)] = line['教学区号']
+        wb.save(self.config.output_path)
+
 
 
         # wb.save(self.config.output_path)
