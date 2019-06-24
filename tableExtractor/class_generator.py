@@ -15,12 +15,14 @@ from openpyxl import Workbook
 
 class CONFIG:
     input_path = "docs/江西师范大学2019年本科招生计划一览表（530定）.xlsx"
-    # db_path = "C:\\Users\sadscv\Desktop\外网.accdb"
     output_path = "docs/output.xlsx"
+    old_campus_list = ['音乐学', '音乐表演', '舞蹈学', '表演(健美操方向）',
+                       '表演（体育舞蹈方向）', '武术与民族传统体育']
 
 
 class ClassGenerator:
     def __init__(self):
+        self.processed_lines = []
         self.count = 0
         self.config = CONFIG()
 
@@ -28,7 +30,6 @@ class ClassGenerator:
         raw_xls = openpyxl.load_workbook(self.config.input_path)
         print(raw_xls.sheetnames)
         ws = raw_xls.active
-        processed_data = []
         for row in ws.iter_rows(min_row=2, max_row=105):
             major_name = str(row[1].value)
             # test case1：汇总一行为空
@@ -36,7 +37,6 @@ class ClassGenerator:
                 # for each line in excel, loop i time while i is the number of
                 # classes of current major
                 self.read_line(row, major_name)
-
 
     def read_line(self, row, major_name):
         major_population = int(row[13].value)
@@ -68,22 +68,25 @@ class ClassGenerator:
             processed_line['年级号'] = '2019/9/1'
             processed_line['班级人数'] = class_population
             processed_line['学分制状态'] = '1'
-            if re.search('武术与民族|表演|音乐表演|音乐学|', major_name):
+            if major_name in self.config.old_campus_list:
                 processed_line['教学区号'] = '01'
             else:
                 processed_line['教学区号'] = '02'
-            for item in processed_line:
-                print(item, processed_line[item])
-            print('---'*10)
-
+            self.processed_lines.append(processed_line)
+        print('1')
 
     def write2xls(self):
         wb = Workbook()
         ws = wb.active
+        ws['A1'] = '班级号'
+        for item in range(len(self.processed_lines)):
+            print(item)
 
-        wb.save(self.config.output_path)
+
+        # wb.save(self.config.output_path)
 
 
 if __name__ == '__main__':
     cg = ClassGenerator()
     cg.read_raw()
+    cg.write2xls()
