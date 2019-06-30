@@ -118,13 +118,13 @@ class course_insertor(object):
         odbc_conn_str = "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};" \
                         "DBQ=%s;" % (db_path)
 
-        conn = pyodbc.connect(odbc_conn_str)
+        conn = pyodbc.connect(odbc_conn_str, autocommit=True)
         return conn, conn.cursor()
 
     def get_teacher_lists(self):
-        conn_local, cursor_local = self.db_init_local()
+        conn_local, cursor_local = self.conn, self.cursor
         # sql = "select 教号, COUNT(教号) as 次数 from 音乐学院小课数据 group by 教号;"
-        sql = "select *  from dbo.教工 where dbo_教工.教号 like 'jwc*';"
+        sql = "select 教号  from dbo.教工 where dbo.教工.教号 like 'jwc%';"
         result = cursor_local.execute(sql).fetchall()
         return result
 
