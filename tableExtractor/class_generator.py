@@ -62,8 +62,11 @@ class ClassGenerator:
                 class_name = "19级{}{}班".format(major_name, i + 1)
             processed_line['班级号'] = self.count + 20190000
             processed_line['班级名称'] = class_name
+            processed_line['学院'] = row[0].value
             processed_line['班级性质号'] = '01'
             processed_line['年级号'] = '2019/9/1'
+            # major_code = self.major_code_in_db(str(row[2].value).lstrip('‘'))
+            # processed_line['专业代码'] = major_code if major_code else None
             processed_line['班级人数'] = class_population
             processed_line['学分制状态'] = '1'
             processed_line['专业名称'] = major_name
@@ -72,6 +75,35 @@ class ClassGenerator:
             else:
                 processed_line['教学区号'] = '02'
             self.processed_lines.append(processed_line)
+
+    def db_init(self):
+        database = 'dbo'
+        dsn = 'web'
+        user = '090134'
+        password = 'sadsad'
+        odbc_conn_str = "DSN={};UID={};PWD={}".format(dsn, user, password)
+
+        import pyodbc
+        print(odbc_conn_str)
+        conn = pyodbc.connect(odbc_conn_str)
+        return conn, conn.cursor
+
+    def major_code_in_db(self, raw_code):
+        conn, cursor = self.db_init()
+        if self.have_major_code_in_db(raw_code):
+            return raw_code
+
+    def have_major_code_in_db(self, raw_code):
+        conn_local, cursor_local = self.db_init()
+        sql = "select * " \
+              "from 音乐学院小课数据 " \
+              "where 教号={};".format(raw_code)
+        result = cursor_local.execute(sql).fetchall()
+        if result:
+            print(result)
+            return True
+        else:
+            return False
 
     def write2xls(self):
         wb = openpyxl.load_workbook(self.config.output_path)
@@ -89,8 +121,10 @@ class ClassGenerator:
                 ws['D' + str(index + 1)] = line['年级号']
                 ws['E' + str(index + 1)] = line['班级人数']
                 ws['F' + str(index + 1)] = line['学分制状态']
-                # ws['I'+str(index+1)] = line['专业名称']
+                ws['G' + str(index + 1)] = line['学院']
+                # ws['I'+str(index+1)] = line['专业代码']
                 ws['J' + str(index + 1)] = line['教学区号']
+                ws['K' + str(index + 1)] = line['专业名称']
         wb.save(self.config.output_path)
 
 

@@ -1,11 +1,9 @@
-
 import platform
 import pyodbc
 import sqlite3
 
 
-
-class class_insertor(object):
+class course_insertor(object):
 
     def __init__(self):
         self.conn, self.cursor = self.db_init()
@@ -152,11 +150,9 @@ class class_insertor(object):
                 cursor_local.commit()
 
 
-
-
 if __name__ == '__main__':
     teacher_list = ['jwc046']
-    insertor = class_insertor()
+    insertor = course_insertor()
     teacher_list = insertor.get_teacher_lists()
     teacher_list = [(t[0].strip(), t[1]) for t in teacher_list]
     insertor.insert_course_name(teacher_list)
