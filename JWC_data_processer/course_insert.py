@@ -123,7 +123,8 @@ class course_insertor(object):
 
     def get_teacher_lists(self):
         conn_local, cursor_local = self.db_init_local()
-        sql = "select 教号, COUNT(教号) as 次数 from 音乐学院小课数据 group by 教号;"
+        # sql = "select 教号, COUNT(教号) as 次数 from 音乐学院小课数据 group by 教号;"
+        sql = "select *  from dbo.教工 where dbo_教工.教号 like 'jwc*';"
         result = cursor_local.execute(sql).fetchall()
         return result
 
@@ -154,6 +155,7 @@ if __name__ == '__main__':
     teacher_list = ['jwc046']
     insertor = course_insertor()
     teacher_list = insertor.get_teacher_lists()
+    print(teacher_list)
     teacher_list = [(t[0].strip(), t[1]) for t in teacher_list]
     insertor.insert_course_name(teacher_list)
     # insertor.insert_split_data(teacher_list)
