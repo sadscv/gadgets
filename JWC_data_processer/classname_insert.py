@@ -15,7 +15,7 @@ class class_insertor(object):
         init db connection, Win&&Linux supported
         :return: conn
         """
-        db_path = '219.229.250.19:1433'
+        db_path = '' # 19:1433
         # db_path = config.dbpath
         my_platform = platform.system()
         if my_platform == 'Linux':
