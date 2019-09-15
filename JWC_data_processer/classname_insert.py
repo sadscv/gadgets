@@ -29,8 +29,8 @@ class class_insertor(object):
             # Todo: update database config.
             database = 'dbo'
             dsn = 'web'
-            user = 'huangwei'
-            password = '840327'
+            user = ''
+            password = ''
             odbc_conn_str = "DSN={};UID={};PWD={}".format(dsn, user, password)
 
             import pyodbc

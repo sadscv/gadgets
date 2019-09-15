@@ -79,8 +79,8 @@ class ClassGenerator:
     def db_init(self):
         database = 'dbo'
         dsn = 'web'
-        user = '090134'
-        password = 'sadsad'
+        user = ''
+        password = ''
         odbc_conn_str = "DSN={};UID={};PWD={}".format(dsn, user, password)
 
         import pyodbc
