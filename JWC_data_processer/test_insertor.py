@@ -23,7 +23,7 @@ class TestInsertor(TestCase):
 
     def test_get_course_info_by_t_id(self):
         for t in self.teacher_list:
-            class_info = self.insertor.get_course_info_by_t_id(
+            class_info = self.insertor.get_class_info_by_t_id(
                 cursor=self.cursor, t_id=t)
             print(len(class_info))
 

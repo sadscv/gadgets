@@ -83,33 +83,39 @@ class course_insertor(object):
             class_infos.append(class_info)
         return class_infos
 
-    def insert_course_name(self, teacher_list):
+    def insert_ChaiBan(self, course_num, class_nums, teacher_list,
+                       classroom_list):
         """
 
         :param teacher_list:
         :return:
         """
+        tmp_cls_list = []
+        for i in range(5):
+            for c in classroom_list:
+                tmp_cls_list.append(c)
+        classroom_list = tmp_cls_list
         self.conn_local, self.cursor_local = self.db_init_local()
-        for t_id, t_count in teacher_list:
-            class_infos = self.get_course_info_by_t_id(self.cursor, t_id,
-                                                       t_count)
-            for info in class_infos:
-                sql = "INSERT into tmp_course " \
-                      "VALUES ('{}','{}','{}',NULL,NULL,'{}',NULL,NULL,NULL,NULL,NULL);" \
-                    .format(info['class_id'],
-                            info['class_name'],
-                            info['class_prop'],
-                            info['score_status'])
-                print('$', sql)
-                # sql = "select * from tmp_tea_id"
-                # while self.cursor_local.execute(sql).fetchall():
-                #     try:
-                #         result = self.cursor_local.fetchall()
-                #         break
-                #     except pyodbc.ProgrammingError:
-                #         continue
-                self.cursor_local.execute(sql).commit()
-                # Todo: cursor.execute(sql)
+        for i in range(len(class_nums)):
+            sql = "INSERT into tmp_courses " \
+                  "VALUES ('{}','{}','{}','{}','{}','Z','60','60','60','60',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{}','2019/7/1 02:14:00',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'10',NULL,NULL);" \
+                .format('2019-9-1',
+                        course_num,
+                        class_nums[i],
+                        class_nums[i],
+                        teacher_list[i],
+                        classroom_list[i]
+                        )
+            self.cursor_local.execute(sql)
+            # sql = "select * from tmp_tea_id"
+            # while self.cursor_local.execute(sql).fetchall():
+            #     try:
+            #         result = self.cursor_local.fetchall()
+            #         break
+            #     except pyodbc.ProgrammingError:
+            #         continue
+            # self.cursor_local.execute(sql).commit()
+            # Todo: cursor.execute(sql)
 
     def db_init_local(self):
         db_path = "C:\\Users\sadscv\Desktop\外网.accdb"
@@ -124,9 +130,26 @@ class course_insertor(object):
     def get_teacher_lists(self):
         conn_local, cursor_local = self.conn, self.cursor
         # sql = "select 教号, COUNT(教号) as 次数 from 音乐学院小课数据 group by 教号;"
-        sql = "select 教号  from dbo.教工 where dbo.教工.教号 like 'jwc%';"
+        sql = "select 教号  from dbo.教工 where dbo.教工.教号 like '00待定%';"
         result = cursor_local.execute(sql).fetchall()
-        return result
+        clean = []
+        for i in range(3):
+            for row in result:
+                for i in row:
+                    clean.append(i)
+        return clean
+
+    def get_classroom_list(self):
+        conn_local, cursor_local = self.conn, self.cursor
+        # sql = "select 教号, COUNT(教号) as 次数 from 音乐学院小课数据 group by 教号;"
+        sql = "select 教室号  from dbo.教室 where dbo.教室.教室号 like 'V%';"
+        result = cursor_local.execute(sql).fetchall()
+        clean = []
+        for i in range(2):
+            for row in result:
+                for i in row:
+                    clean.append(i)
+        return clean
 
     def insert_split_data(self, teacher_list):
         """
@@ -134,9 +157,7 @@ class course_insertor(object):
         :param teacher_list: [(t_id, num),()]
         :return:
         """
-
         conn_local, cursor_local = self.db_init_local()
-        print(teacher_list)
         for t in teacher_list:
             sql = "select * from 音乐学院小课数据 where 教号='{}';".format(t[0])
             result = cursor_local.execute(sql).fetchall()
@@ -150,12 +171,26 @@ class course_insertor(object):
                 print(sql)
                 cursor_local.commit()
 
+    def get_class_num(self, course_num):
+        sql = "select 班级号 from dbo.开课计划 where 课程号='{}' and 开课时间='2019-9-1'".format(
+            course_num)
+        result = self.cursor.execute(sql).fetchall()
+        clean = []
+        for row in result:
+            for i in row:
+                clean.append(i)
+        return clean
+
 
 if __name__ == '__main__':
-    teacher_list = ['jwc046']
     insertor = course_insertor()
     teacher_list = insertor.get_teacher_lists()
-    print(teacher_list)
-    teacher_list = [(t[0].strip(), t[1]) for t in teacher_list]
-    insertor.insert_course_name(teacher_list)
+    # teacher_list = [(t[0].strip(), t[1]) for t in teacher_list]
+    course_num = '056001'
+    class_nums = insertor.get_class_num(course_num)
+    classroom_list = insertor.get_classroom_list()
+    print(class_nums)
+    # insertor.insert_ChaiBan(course_num, class_nums,
+    #                         teacher_list,classroom_list)
+    # insertor.insert_AnPai(course_num, class_nums, teacher_list, )
     # insertor.insert_split_data(teacher_list)
