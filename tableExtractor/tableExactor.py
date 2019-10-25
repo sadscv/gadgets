@@ -22,17 +22,36 @@ def read_doc(file):
 
 def read_directory():
     rootdir = os.getcwd() + '/docs' # 获取当前目录
-    list = os.listdir(rootdir )  # 列出文件夹下所有的目录与文件
-    paths = []
-    for i in range(0, len(list)):
-        path = os.path.join(rootdir, list[i])
-        paths.append(path)
+    # list = os.listdir(rootdir )  # 列出文件夹下所有的目录与文件
+    # paths = []
+    # for i in range(0, len(list)):
+    #     path = os.path.join(rootdir, list[i])
+    #     paths.append(path)
+    paths = get_all_files(rootdir)
+    # for p in paths:
+    #     _, filename = os.path.split(p)
+    #     tmpdir = os.getcwd() + '/tmp'
+    #     moveto = os.path.join(tmpdir, filename)  ##dirname 上一层目录
+    #     os.rename(p, moveto)
+    # print(p, moveto)
     return paths
+
+
+def get_all_files(dir):
+    files_ = []
+    list = os.listdir(dir)
+    for i in range(0, len(list)):
+        path = os.path.join(dir, list[i])
+        if os.path.isdir(path):
+            files_.extend(get_all_files(path))
+        if os.path.isfile(path):
+            files_.append(path)
+    return files_
 
 
 def write_xls(files):
     import xlwt
-    header = ['文件名','主讲单位','主讲','讲座题目','职称职务', '拟安排\n日期', '内容提要']
+    header = ['文件名', '主讲单位', '主讲人', '工号', '讲座题目', '职称职务', '拟安排\n日期', '内容提要']
 
     tmp_dicts = []
     for f in files:
@@ -84,11 +103,12 @@ def write_xls(files):
         try:
             sheet.write(row, 0, tmp_dict['文件名'])  # 第二行开始
             sheet.write(row, 1, tmp_dict['主讲单位'])  # 第二行开始
-            sheet.write(row, 2, tmp_dict['主讲'])  # 第二行开始
-            sheet.write(row, 3, tmp_dict['讲座题目'])  # 第二行开始
-            sheet.write(row, 4, tmp_dict['职称职务'])  # 第二行开始
-            sheet.write(row, 5, tmp_dict['拟安排'])  # 第二行开始
-            sheet.write(row, 6, tmp_dict['内容提要'])  # 第二行开始
+            sheet.write(row, 2, tmp_dict['主讲人'])  # 第二行开始
+            sheet.write(row, 3, tmp_dict['工号'])  # 第二行开始
+            sheet.write(row, 4, tmp_dict['讲座题目'])  # 第二行开始
+            sheet.write(row, 5, tmp_dict['职称职务'])  # 第二行开始
+            sheet.write(row, 6, tmp_dict['拟安排'])  # 第二行开始
+            sheet.write(row, 7, tmp_dict['内容提要'])  # 第二行开始
         except KeyError:
             pass
 
@@ -98,9 +118,28 @@ def write_xls(files):
     book.save(os.getcwd() + '/docs/test.xls')
 
 
+def remove_name(files):
+    COUNT = 0
+    for file in files:
+        doc = Document(file)
+        for table in doc.tables:
+            for row in table.rows:
+                for i in range(len(row.cells)):
+                    if row.cells[i].text == '主讲人' and row.cells[
+                        i + 1].text != '主讲人':
+                        print(row.cells[i + 1].text)
+                        COUNT += 1
+                        print(COUNT)
+
+
+
+
+
 if __name__ == '__main__':
     paths = read_directory()
+    print(paths)
     files = []
     for p in paths:
         files.append(read_doc(p))
+    # remove_name(paths)
     write_xls(files)
