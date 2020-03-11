@@ -13,6 +13,7 @@ def convert2list(table, name):
     table_temp[name] = dict(zip(list[0::2], list[1::2]))
     return table_temp
 
+
 def read_doc(file):
     name = os.path.basename(file)[:-4]
     doc = Document(file)
@@ -20,9 +21,10 @@ def read_doc(file):
         table_dict = convert2list(table, name)
     return table_dict
 
+
 def read_directory():
-    rootdir = os.getcwd() + '/docs' # 获取当前目录
-    list = os.listdir(rootdir )  # 列出文件夹下所有的目录与文件
+    rootdir = os.getcwd() + '/docs'  # 获取当前目录
+    list = os.listdir(rootdir)  # 列出文件夹下所有的目录与文件
     paths = []
     for i in range(0, len(list)):
         path = os.path.join(rootdir, list[i])
@@ -32,36 +34,36 @@ def read_directory():
 
 def write_xls(files):
     import xlwt
-    header = ['文件名','主讲单位','主讲','讲座题目','职称职务', '拟安排\n日期', '内容提要']
+    header = ['文件名', '主讲单位', '主讲', '讲座题目', '职称职务', '拟安排\n日期', '内容提要']
 
     tmp_dicts = []
     for f in files:
         tmp_dict = {}
-        print('#'*200)
+        print('#' * 200)
         for key in f:
             print(key)
             tmp_dict['文件名'] = key
-            for k,v in f[key].items():
+            for k, v in f[key].items():
                 if k.strip() in header:
                     tmp_dict[k] = v
-                    print(k,v)
+                    print(k, v)
                 elif '内容提要' in k:
                     try:
                         tmp_dict['内容提要'] = str(k)
-                        print('&'*200)
+                        print('&' * 200)
                         print(str(k))
                     except UnicodeDecodeError as e:
                         continue
                 elif '内容提要' in v:
                     try:
                         tmp_dict['内容提要'] = str(v)
-                        print('&'*200)
+                        print('&' * 200)
                         print(str(v))
                     except UnicodeDecodeError as e:
                         continue
                 elif '拟安排' in k:
                     tmp_dict['拟安排'] = v
-                    print(k,v)
+                    print(k, v)
         tmp_dicts.append(tmp_dict)
 
     # 创建一个Workbook对象，这就相当于创建了一个Excel文件
